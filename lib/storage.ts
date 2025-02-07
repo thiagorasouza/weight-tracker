@@ -10,18 +10,39 @@ export async function addRecord(
   date: WeightRecord["date"],
 ) {
   try {
-    const lastIndex = await getLastIndex();
-    const record: WeightRecord = { id: lastIndex + 1, weight, date };
+    const newIndex = (await getLastIndex()) + 1;
+    const record: WeightRecord = { id: newIndex, weight, date };
 
     const records = await getRecords();
     records.unshift(record);
 
     const recordsStr = JSON.stringify(records);
     AsyncStorage.setItem(RECORDS_KEY_NAME, recordsStr);
-    AsyncStorage.setItem(LAST_INDEX_KEY_NAME, String(lastIndex));
+    AsyncStorage.setItem(LAST_INDEX_KEY_NAME, String(newIndex));
     return true;
   } catch (error) {
     console.error(error);
+    return false;
+  }
+}
+
+export async function editRecord(
+  id: WeightRecord["id"],
+  newWeight: WeightRecord["weight"],
+) {
+  try {
+    const records = await getRecords();
+    for (const record of records) {
+      if (record.id === id) {
+        record.weight = newWeight;
+        const recordsStr = JSON.stringify(records);
+        AsyncStorage.setItem(RECORDS_KEY_NAME, recordsStr);
+        return true;
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
     return false;
   }
 }
