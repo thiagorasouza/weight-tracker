@@ -3,11 +3,17 @@ import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SplashScreen } from "expo-router";
 import { useEffect, useState } from "react";
 import { isToday } from "date-fns";
-import { addRecord, editRecord, getRecords } from "@/lib/storage";
+import {
+  addRecord,
+  clearAllRecords,
+  editRecord,
+  getRecords,
+} from "@/lib/storage";
 import { formatDate } from "@/lib/utils";
 import WeightInput from "@/components/WeightInput";
 //@ts-ignore
 import Logo from "@/assets/images/icon.png";
+import { seed } from "@/lib/seed";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -15,6 +21,8 @@ export default function Index() {
   const [weight, setWeight] = useState<string>("00.00");
   const [records, setRecords] = useState<WeightRecord[]>();
   const stale = records === undefined;
+  const isTodaySet =
+    !!records && records.length > 0 && isToday(records[0].date);
 
   async function loadRecords() {
     const result = await getRecords();
@@ -36,8 +44,14 @@ export default function Index() {
 
   const onAddClick = async () => {
     const today = new Date().toISOString();
-    const formattedWeight = weight.replace(",", ".");
-    await addRecord(formattedWeight, today);
+    await addRecord(weight, today);
+    loadRecords();
+  };
+
+  const onReplaceClick = async () => {
+    const lastRecord = !!records && records[0];
+    if (!lastRecord) return;
+    await editRecord(lastRecord.id, weight);
     loadRecords();
   };
 
@@ -75,9 +89,11 @@ export default function Index() {
                 <WeightInput value={weight} onChangeText={setWeight} />
                 <TouchableOpacity
                   className="rounded-full px-7 py-3 bg-slate-400"
-                  onPress={onAddClick}
+                  onPress={isTodaySet ? onReplaceClick : onAddClick}
                 >
-                  <Text className="text-2xl font-semibold">Add</Text>
+                  <Text className="text-2xl font-semibold">
+                    {isTodaySet ? "Replace" : "Add"}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
