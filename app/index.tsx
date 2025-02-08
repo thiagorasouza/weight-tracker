@@ -3,17 +3,11 @@ import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SplashScreen } from "expo-router";
 import { useEffect, useState } from "react";
 import { isToday } from "date-fns";
-import {
-  addRecord,
-  clearAllRecords,
-  editRecord,
-  getRecords,
-} from "@/lib/storage";
+import { addRecord, editRecord, getRecords } from "@/lib/storage";
 import { formatDate } from "@/lib/utils";
 import WeightInput from "@/components/WeightInput";
 //@ts-ignore
 import Logo from "@/assets/images/icon.png";
-import { seed } from "@/lib/seed";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -63,17 +57,33 @@ export default function Index() {
     <SafeAreaProvider>
       <SafeAreaView className="flex-1 px-5 pt-5">
         <FlatList
-          contentContainerClassName="flex flex-col gap-8"
+          contentContainerClassName="flex flex-col gap-10"
           data={records}
           keyExtractor={(record) => String(record.id)}
-          renderItem={({ item }) => (
-            <View className="flex gap-1 items-center">
-              <Text className="text-xs">
-                {isToday(item.date) ? "today" : formatDate(item.date)}
-              </Text>
-              <Text className="text-3xl font-semibold">{item.weight}</Text>
-            </View>
-          )}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item, index }) => {
+            const previous =
+              index + 1 < records.length ? records[index + 1] : records[index];
+            const variation =
+              parseFloat(item.weight) - parseFloat(previous.weight);
+
+            return (
+              <View className="flex gap-1 items-center">
+                <Text className="text-xs">
+                  {isToday(item.date) ? "today" : formatDate(item.date)}
+                </Text>
+                <View>
+                  <Text className="text-3xl font-semibold">{item.weight}</Text>
+                </View>
+                <Text
+                  className={`text-xs font-bold ${variation > 0 ? "text-red-300" : "text-green-500"}`}
+                >
+                  {variation > 0 && "+"}
+                  {variation.toFixed(2)}
+                </Text>
+              </View>
+            );
+          }}
           ListEmptyComponent={
             <View className="flex items-center">
               <Text>No records found.</Text>

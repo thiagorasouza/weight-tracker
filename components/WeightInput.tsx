@@ -3,6 +3,7 @@ import {
   TextInput,
   TextInputKeyPressEventData,
   NativeSyntheticEvent,
+  Text,
 } from "react-native";
 import React, { useRef } from "react";
 
@@ -77,7 +78,7 @@ const WeightInput = ({
     <View className="flex flex-row items-center">
       <TextInput
         ref={inputRef1}
-        className="text-8xl font-bold"
+        className="text-8xl font-bold leading-[96px]"
         value={value[0]}
         selectTextOnFocus
         keyboardType="number-pad"
@@ -85,16 +86,20 @@ const WeightInput = ({
       />
       <TextInput
         ref={inputRef2}
-        className="text-8xl font-bold"
+        className="text-8xl font-bold leading-[96px]"
         value={value[1]}
         selectTextOnFocus
         keyboardType="number-pad"
         onKeyPress={handleKeyPress2}
       />
-      <TextInput className="text-8xl font-bold" value={value[2]} readOnly />
+      <TextInput
+        className="text-8xl font-bold leading-[96px]"
+        value={value[2]}
+        readOnly
+      />
       <TextInput
         ref={inputRef3}
-        className="text-8xl font-bold"
+        className="text-8xl font-bold leading-[96px]"
         value={value[3]}
         selectTextOnFocus
         keyboardType="number-pad"
@@ -102,12 +107,13 @@ const WeightInput = ({
       />
       <TextInput
         ref={inputRef4}
-        className="text-8xl font-bold"
+        className="text-8xl font-bold leading-[96px]"
         value={value[4]}
         selectTextOnFocus
         keyboardType="number-pad"
         onKeyPress={handleKeyPress4}
       />
+      <Text className="self-end mb-[17px] font-bold text-3xl">kg</Text>
     </View>
   );
 };
