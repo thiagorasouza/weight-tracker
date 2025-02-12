@@ -35,11 +35,21 @@ export async function editRecord(
     for (const record of records) {
       if (record.id === id) {
         record.weight = newWeight;
-        const recordsStr = JSON.stringify(records);
-        AsyncStorage.setItem(RECORDS_KEY_NAME, recordsStr);
-        return true;
+        return await storeRecords(records);
       }
     }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    return false;
+  }
+}
+
+export async function deleteRecord(id: WeightRecord["id"]) {
+  try {
+    const records = await getRecords();
+    const recordsFiltered = records.filter((record) => record.id !== id);
+    return await storeRecords(recordsFiltered);
   } catch (error) {
     console.log(error);
   } finally {
@@ -79,6 +89,17 @@ export async function getLastIndex(): Promise<number> {
   } catch (error) {
     console.log(error);
     return 0;
+  }
+}
+
+export async function storeRecords(records: WeightRecord[]) {
+  try {
+    const recordsStr = JSON.stringify(records);
+    await AsyncStorage.setItem(RECORDS_KEY_NAME, recordsStr);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
   }
 }
 

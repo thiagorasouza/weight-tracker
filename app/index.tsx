@@ -3,11 +3,13 @@ import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SplashScreen } from "expo-router";
 import { useEffect, useState } from "react";
 import { isToday } from "date-fns";
-import { addRecord, editRecord, getRecords } from "@/lib/storage";
+import { addRecord, deleteRecord, editRecord, getRecords } from "@/lib/storage";
 import { formatDate } from "@/lib/utils";
 import WeightInput from "@/components/WeightInput";
 //@ts-ignore
 import Logo from "@/assets/images/icon.png";
+import WeightItem from "@/components/WeightItem";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,16 +38,21 @@ export default function Index() {
     }
   }, [stale]);
 
-  const onAddClick = async () => {
+  const onAddPress = async () => {
     const today = new Date().toISOString();
     await addRecord(weight, today);
     loadRecords();
   };
 
-  const onReplaceClick = async () => {
+  const onReplacePress = async () => {
     const lastRecord = !!records && records[0];
     if (!lastRecord) return;
     await editRecord(lastRecord.id, weight);
+    loadRecords();
+  };
+
+  const onDeletePress = async (id: number) => {
+    await deleteRecord(id);
     loadRecords();
   };
 
@@ -56,59 +63,53 @@ export default function Index() {
   return (
     <SafeAreaProvider>
       <SafeAreaView className="flex-1 px-5 pt-5">
-        <FlatList
-          contentContainerClassName="flex flex-col gap-10"
-          data={records}
-          keyExtractor={(record) => String(record.id)}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item, index }) => {
-            const previous =
-              index + 1 < records.length ? records[index + 1] : records[index];
-            const variation =
-              parseFloat(item.weight) - parseFloat(previous.weight);
-
-            return (
-              <View className="flex gap-1 items-center">
-                <Text className="text-xs">
-                  {isToday(item.date) ? "today" : formatDate(item.date)}
-                </Text>
-                <View>
-                  <Text className="text-3xl font-semibold">{item.weight}</Text>
+        <GestureHandlerRootView>
+          <FlatList
+            contentContainerClassName="flex flex-col gap-10"
+            data={records}
+            keyExtractor={(record) => String(record.id)}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item, index }) => {
+              const previous =
+                index + 1 < records.length
+                  ? records[index + 1]
+                  : records[index];
+              const variation =
+                parseFloat(item.weight) - parseFloat(previous.weight);
+              return (
+                <WeightItem
+                  item={item}
+                  variation={variation}
+                  onDeletePress={onDeletePress}
+                />
+              );
+            }}
+            ListEmptyComponent={
+              <View className="flex items-center">
+                <Text>No records found.</Text>
+              </View>
+            }
+            ListHeaderComponent={
+              <View className="items-center">
+                <View className="flex flex-row items-center gap-3">
+                  <Image source={Logo} className="size-8" />
+                  <Text className="font-bold text-xl">Weight Tracker</Text>
                 </View>
-                <Text
-                  className={`text-xs font-bold ${variation > 0 ? "text-red-300" : "text-green-500"}`}
-                >
-                  {variation > 0 && "+"}
-                  {variation.toFixed(2)}
-                </Text>
+                <View className="items-center my-20">
+                  <WeightInput value={weight} onChangeText={setWeight} />
+                  <TouchableOpacity
+                    className="rounded-full px-7 py-3 bg-slate-400"
+                    onPress={isTodaySet ? onReplacePress : onAddPress}
+                  >
+                    <Text className="text-2xl font-semibold">
+                      {isTodaySet ? "Replace" : "Add"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            );
-          }}
-          ListEmptyComponent={
-            <View className="flex items-center">
-              <Text>No records found.</Text>
-            </View>
-          }
-          ListHeaderComponent={
-            <View className="items-center">
-              <View className="flex flex-row items-center gap-3">
-                <Image source={Logo} className="size-8" />
-                <Text className="font-bold text-xl">Weight Tracker</Text>
-              </View>
-              <View className="items-center my-20">
-                <WeightInput value={weight} onChangeText={setWeight} />
-                <TouchableOpacity
-                  className="rounded-full px-7 py-3 bg-slate-400"
-                  onPress={isTodaySet ? onReplaceClick : onAddClick}
-                >
-                  <Text className="text-2xl font-semibold">
-                    {isTodaySet ? "Replace" : "Add"}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          }
-        />
+            }
+          />
+        </GestureHandlerRootView>
       </SafeAreaView>
     </SafeAreaProvider>
   );

@@ -1,8 +1,16 @@
 import { Stack } from "expo-router";
 
-// Import your global CSS file
 import "./globals.css";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from "react-native-reanimated";
+
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false, // Reanimated runs in strict mode by default
+});
 
 export default function RootLayout() {
   return (
