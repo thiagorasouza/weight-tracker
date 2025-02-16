@@ -4,8 +4,9 @@ import {
   TextInputKeyPressEventData,
   NativeSyntheticEvent,
   Text,
+  Pressable,
 } from "react-native";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 
 export interface WeightInputProps {
   value: string;
@@ -17,6 +18,8 @@ const WeightInput = ({
   value,
   onChangeText: onChangeText,
 }: WeightInputProps) => {
+  const [firstPress, setFirstPress] = useState(true);
+
   const inputRef1 = useRef<TextInput>(null);
   const inputRef2 = useRef<TextInput>(null);
   const inputRef3 = useRef<TextInput>(null);
@@ -74,46 +77,69 @@ const WeightInput = ({
     }
   };
 
+  const onWeightPress = () => {
+    if (firstPress) {
+      inputRef1.current?.focus();
+      setFirstPress(false);
+    }
+  };
+
   return (
-    <View className="flex flex-row items-center">
-      <TextInput
-        ref={inputRef1}
-        className="text-8xl font-bold leading-[96px]"
-        value={value[0]}
-        selectTextOnFocus
-        keyboardType="number-pad"
-        onKeyPress={handleKeyPress1}
-      />
-      <TextInput
-        ref={inputRef2}
-        className="text-8xl font-bold leading-[96px]"
-        value={value[1]}
-        selectTextOnFocus
-        keyboardType="number-pad"
-        onKeyPress={handleKeyPress2}
-      />
-      <TextInput
-        className="text-8xl font-bold leading-[96px]"
-        value={value[2]}
-        readOnly
-      />
-      <TextInput
-        ref={inputRef3}
-        className="text-8xl font-bold leading-[96px]"
-        value={value[3]}
-        selectTextOnFocus
-        keyboardType="number-pad"
-        onKeyPress={handleKeyPress3}
-      />
-      <TextInput
-        ref={inputRef4}
-        className="text-8xl font-bold leading-[96px]"
-        value={value[4]}
-        selectTextOnFocus
-        keyboardType="number-pad"
-        onKeyPress={handleKeyPress4}
-      />
-      <Text className="self-end mb-[17px] font-bold text-3xl">kg</Text>
+    <View>
+      {/* <Pressable onPress={onWeightPress}>
+        <View
+          className={`flex-row items-center ${!showInput ? "flex" : "hidden"}`}
+        >
+          <Text className="text-8xl font-bold tracking-wider">{value}</Text>
+          <Text className="self-end mb-[17px] font-bold text-3xl">kg</Text>
+        </View>
+      </Pressable> */}
+      <Pressable onPress={onWeightPress}>
+        <View className="flex flex-row items-center">
+          <TextInput
+            ref={inputRef1}
+            className="text-8xl font-bold leading-[96px]"
+            value={value[0]}
+            selectTextOnFocus
+            keyboardType="number-pad"
+            onKeyPress={handleKeyPress1}
+          />
+          <TextInput
+            ref={inputRef2}
+            className="text-8xl font-bold leading-[96px]"
+            value={value[1]}
+            selectTextOnFocus
+            keyboardType="number-pad"
+            onKeyPress={handleKeyPress2}
+            pointerEvents={firstPress ? "none" : "auto"}
+          />
+          <TextInput
+            className="text-8xl font-bold leading-[96px]"
+            value={value[2]}
+            readOnly
+            pointerEvents={firstPress ? "none" : "auto"}
+          />
+          <TextInput
+            ref={inputRef3}
+            className="text-8xl font-bold leading-[96px]"
+            value={value[3]}
+            selectTextOnFocus
+            keyboardType="number-pad"
+            onKeyPress={handleKeyPress3}
+            pointerEvents={firstPress ? "none" : "auto"}
+          />
+          <TextInput
+            ref={inputRef4}
+            className="text-8xl font-bold leading-[96px]"
+            value={value[4]}
+            selectTextOnFocus
+            keyboardType="number-pad"
+            onKeyPress={handleKeyPress4}
+            pointerEvents={firstPress ? "none" : "auto"}
+          />
+          <Text className="self-end mb-[17px] font-bold text-3xl">kg</Text>
+        </View>
+      </Pressable>
     </View>
   );
 };

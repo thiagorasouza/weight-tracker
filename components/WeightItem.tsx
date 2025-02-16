@@ -2,7 +2,7 @@ import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
-import { isToday } from "date-fns";
+import { isToday, isYesterday } from "date-fns";
 import { formatDate } from "@/lib/utils";
 import Reanimated, {
   SharedValue,
@@ -38,6 +38,39 @@ interface WeightItemProps {
 }
 
 const WeightItem = ({ item, variation, onDeletePress }: WeightItemProps) => {
+  const isDateToday = isToday(item.date);
+  const isDateYesterday = isYesterday(item.date);
+
+  let content;
+  if (isDateToday) {
+    content = (
+      <>
+        <Text className="font-semibold text-lg">today</Text>
+        <View>
+          <Text className="text-6xl font-semibold">{item.weight}</Text>
+        </View>
+      </>
+    );
+  } else if (isDateYesterday) {
+    content = (
+      <>
+        <Text className="text-lg">yesterday</Text>
+        <View>
+          <Text className="text-[38px] font-semibold">{item.weight}</Text>
+        </View>
+      </>
+    );
+  } else {
+    content = (
+      <>
+        <Text>{formatDate(item.date)}</Text>
+        <View>
+          <Text className="text-3xl font-semibold">{item.weight}</Text>
+        </View>
+      </>
+    );
+  }
+
   return (
     <Swipeable
       friction={2}
@@ -46,15 +79,10 @@ const WeightItem = ({ item, variation, onDeletePress }: WeightItemProps) => {
         <DeleteAction drag={drag} onPress={() => onDeletePress(item.id)} />
       )}
     >
-      <View className="flex gap-1 items-center">
-        <Text className="text-xs">
-          {isToday(item.date) ? "today" : formatDate(item.date)}
-        </Text>
-        <View>
-          <Text className="text-3xl font-semibold">{item.weight}</Text>
-        </View>
+      <View className="flex gap-3 items-center">
+        {content}
         <Text
-          className={`text-xs font-bold ${variation > 0 ? "text-red-300" : "text-green-500"}`}
+          className={`font-bold ${variation > 0 ? "text-red-300" : "text-green-500"}`}
         >
           {variation > 0 && "+"}
           {variation.toFixed(2)}

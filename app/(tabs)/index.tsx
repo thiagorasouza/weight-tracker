@@ -4,7 +4,6 @@ import { SplashScreen } from "expo-router";
 import { useEffect, useState } from "react";
 import { isToday } from "date-fns";
 import { addRecord, deleteRecord, editRecord, getRecords } from "@/lib/storage";
-import { formatDate } from "@/lib/utils";
 import WeightInput from "@/components/WeightInput";
 //@ts-ignore
 import Logo from "@/assets/images/icon.png";
@@ -13,7 +12,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function Index() {
+export default function Home() {
   const [weight, setWeight] = useState<string>("00.00");
   const [records, setRecords] = useState<WeightRecord[]>();
   const stale = records === undefined;
@@ -25,9 +24,9 @@ export default function Index() {
     setRecords(result);
 
     // Sets input value to last weight if any
-    if (result.length > 0) {
-      setWeight(result[0].weight);
-    }
+    // if (result.length > 0) {
+    //   setWeight(result[0].weight);
+    // }
 
     SplashScreen.hideAsync();
   }
@@ -65,7 +64,7 @@ export default function Index() {
       <SafeAreaView className="flex-1 px-5 pt-5">
         <GestureHandlerRootView>
           <FlatList
-            contentContainerClassName="flex flex-col gap-10"
+            contentContainerClassName="flex flex-col gap-14"
             data={records}
             keyExtractor={(record) => String(record.id)}
             showsVerticalScrollIndicator={false}
